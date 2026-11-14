@@ -1,0 +1,41 @@
+@startuml
+title Fluxo de Testes e Autenticação de Cliente (Casos CT-01 a CT-05)
+
+skinparam backgroundColor #EFEFEF
+skinparam ActivityBackgroundColor #F8FAFC
+skinparam ActivityBorderColor #334155
+skinparam ActivityFontColor #0F172A
+skinparam ActivityDiamondBackgroundColor #E2E8F0
+skinparam ActivityDiamondBorderColor #334155
+skinparam ActivityDiamondFontColor #0F172A
+skinparam ArrowColor #334155
+skinparam ArrowFontColor #334155
+
+start
+
+:Recebe Dados de Entrada (Test Input)\nE-mail, Senha e Contador de Tentativas;
+
+if (Tentativas Falhas >= 5?\n[Teste nas Bordas / Valor Limite]) then (Sim)
+  #FFB3BA:**CT-01: Bloqueio por Força Bruta**\nLente: Análise de Valor Limite (Limite = 5)\nFonte da Verdade (Test Oracle):\nBloquear login (HTTP 429) e gravar Log de Segurança;
+  stop
+else (Não: < 5 tentativas)
+  if (E-mail ou Senha vazios?\n[Teste de Exceção / Negativo]) then (Sim)
+    #FFB3BA:**CT-02: Campos Obrigatórios Vazios**\nLente: Teste Negativo\nFonte da Verdade (Test Oracle):\nRetornar erro "Preencha todos os campos";
+    stop
+  else (Não: Campos preenchidos)
+    if (Formato de E-mail válido E Senha >= 8 caracteres?\n[Agrupamento de Dados e Valor Limite]) then (Não)
+      #FFDFBA:**CT-03: E-mail Inválido ou Senha Curta (ex: 7 chars)**\nLente: Partição de Equivalência / Valor Limite\nFonte da Verdade (Test Oracle):\nRejeitar formato antes de consultar o banco;
+      stop
+    else (Sim: Formato e Tamanho Válidos)
+      if (E-mail existe E Senha confere com Hash?\n[Validação da Regra de Negócio]) then (Não)
+        #FFB3BA:**CT-04: Credenciais Incorretas**\nLente: Teste Negativo / Partição Inválida\nFonte da Verdade (Test Oracle):\nIncrementar tentativas (+1), negar acesso e exibir\n"E-mail ou senha inválidos";
+        stop
+      else (Sim)
+        #BAFFC9:**CT-05: Autenticação com Sucesso**\nLente: Caminho Perfeito (Happy Path)\nFonte da Verdade (Test Oracle):\nZerar contador de falhas, criar Sessão Autenticada\ne redirecionar para o Painel do Cliente;
+      endif
+    endif
+  endif
+endif
+
+stop
+@enduml
