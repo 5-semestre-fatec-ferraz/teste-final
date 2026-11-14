@@ -28,3 +28,8 @@ Quem conseguir entrar e souber de algum colega da turma que não esteja consegui
 
 Bom trabalho.  
 Prof. Alexander.
+
+* [Roteiro do Trabalho. Reengenharia e Implementação de Testes de Software](roteiro_trabalho_reengenharia_implementacao_testes_software.md)
+* [Explicando atividade](explicando-atividade.md)
+* [Planilha de testes](planilha-testes.md)
+
